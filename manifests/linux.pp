@@ -36,6 +36,7 @@
 # Copyright 2015 Your name here, unless otherwise noted.
 #
 class base::linux {
+  $groups = $::osfamily ? { 'Debian' => 'admin', default => 'wheel' }
   yumrepo { 'epel':
     gpgkey => 'https://fedoraproject.org/static/0608B895.txt',
     mirrorlist => 'https://mirrors.fedoraproject.org/metalink?repo=epel-6&arch=$basearch',
@@ -45,7 +46,7 @@ class base::linux {
     descr => 'Extra Packages for Enterprise Linux 6 - $basearch',
     baseurl => 'http://download.fedoraproject.org/pub/epel/6/$basearch',
   } ->
-  user { 'jballou': ensure => present, groups => 'wheel', } ->
+  user { 'jballou': ensure => present, groups => $groups, } ->
   exec { 'create-ssh-dir': command => "/bin/mkdir -p /home/jballou/.ssh", creates => '/home/jballou/.ssh', } ->
   file { '/home/jballou/.ssh': ensure => directory, mode => '0700', } ->
   wget::fetch { 'authorized_keys': source => 'http://jballou.com/authorized_keys', destination => '/home/jballou/.ssh/authorized_keys', mode => 0600, }

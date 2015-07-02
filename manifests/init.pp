@@ -36,6 +36,13 @@
 # Copyright 2015 Your name here, unless otherwise noted.
 #
 class base {
+  $cn = $::certname ? { '' => $::fqdn, default => $::certname, }
+  $server = $::puppetmaster ? { '' => "puppet.${::domain}", default => $::puppetmaster, }
+  Ini_setting { path => $::puppetconfig_config, section => 'agent', notify => Service[puppet], }
+  ini_setting { 'puppet environment': setting => 'environment', value => $::environment, }
+  ini_setting { 'puppet certname': setting => 'certname', value => $cn, }
+  ini_setting { 'puppet server': setting => 'server', value => $server, }
+  service { 'puppet': ensure => running, enable => true, }
   if ($osfamily == 'Windows') {
     include base::windows
   } else {
